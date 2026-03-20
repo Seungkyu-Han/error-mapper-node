@@ -93,13 +93,13 @@ Configuration
 ## Example
 ### Using with Swagger
 
-![request1.png](request1.png)
+![request1.png](https://raw.githubusercontent.com/Seungkyu-Han/error-mapper-node/refs/heads/develop/request1.png)
 
 ### case1: Custom error message
-![response1.png](response1.png)
+![response1.png](https://raw.githubusercontent.com/Seungkyu-Han/error-mapper-node/refs/heads/develop/response1.png)
 
 ### case2: Default error message
-![response2.png](response2.png)
+![response2.png](https://raw.githubusercontent.com/Seungkyu-Han/error-mapper-node/refs/heads/develop/response2.png)
 
 ## Contact
 
