@@ -1,6 +1,6 @@
 {
   "name": "@seungkyu/error-mapper",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Map an error to another error or an HTTP exception in NestJS.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

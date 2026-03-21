@@ -1,8 +1,8 @@
 import { Type } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { MAP_ERROR } from '../symbols/map-error.symbol';
 import { HttpErrorMappingDefinition } from '../types/http-error-definition.type';
 import { Handler } from '../types/handler-function.type';
+import { MAP_HTTP_ERROR } from '../symbols/map-http-error.symbol';
 
 export class HttpErrorCacheHelper {
   private readonly cache = new WeakMap<
@@ -19,7 +19,8 @@ export class HttpErrorCacheHelper {
 
     if (!errorMap) {
       const definitions =
-        reflector.get<HttpErrorMappingDefinition[]>(MAP_ERROR, handler) ?? [];
+        reflector.get<HttpErrorMappingDefinition[]>(MAP_HTTP_ERROR, handler) ??
+        [];
 
       errorMap = new Map(definitions.map((def) => [def.sourceError, def]));
 
