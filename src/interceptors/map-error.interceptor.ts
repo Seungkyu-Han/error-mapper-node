@@ -12,7 +12,7 @@ import { HttpErrorCacheHelper } from '../core/http-error-cache.helper';
 import { ErrorCacheHelper } from '../core/error-cache.helper';
 
 @Injectable()
-export class MapHttpErrorInterceptor implements NestInterceptor {
+export class MapErrorInterceptor implements NestInterceptor {
   private readonly httpErrorCacheHandler = new HttpErrorCacheHelper();
   private readonly errorCacheHandler = new ErrorCacheHelper();
 
