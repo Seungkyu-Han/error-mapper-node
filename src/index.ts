@@ -1,3 +1,3 @@
-export * from './decorators/map-http-error.decorator';
+export * from './decorators/map-error.decorator';
 
-export * from './interceptors/map-http-error.interceptor';
+export * from './interceptors/map-error.interceptor';
