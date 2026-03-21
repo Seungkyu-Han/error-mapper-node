@@ -1,8 +1,7 @@
 import { Type } from '@nestjs/common';
 
-export type ErrorMappingDefinition = {
-  type: 'error';
+export interface ErrorMappingDefinition {
   sourceError: Type<Error>;
   targetError: Type<Error>;
   message?: string;
-};
+}

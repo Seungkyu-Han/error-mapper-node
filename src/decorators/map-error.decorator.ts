@@ -1,42 +1,44 @@
 import { HttpErrorMappingDefinition } from '../types/http-error-definition.type';
-import { ErrorMappingDefinition } from '../types/error-definition.type';
 import { MAP_HTTP_ERROR } from '../symbols/map-http-error.symbol';
 import { MAP_ERROR } from '../symbols/map-error.symbol';
+import { ErrorMappingDefinition } from '../types/error-definition.type';
 
-type ErrorDefinition = ErrorMappingDefinition | HttpErrorMappingDefinition;
-
-export function MapError(errorDefinition: ErrorDefinition): MethodDecorator {
+export function MapError(
+  definition: HttpErrorMappingDefinition,
+): MethodDecorator;
+export function MapError(definition: ErrorMappingDefinition): MethodDecorator;
+export function MapError(definition: any): MethodDecorator {
   return (target, propertyKey, descriptor) => {
-    switch (errorDefinition.type) {
-      case 'http': {
-        const existing: HttpErrorMappingDefinition[] =
-          (Reflect.getMetadata(
-            MAP_HTTP_ERROR,
-            descriptor.value!,
-          ) as HttpErrorMappingDefinition[]) ?? [];
-
-        Reflect.defineMetadata(
+    if ('status' in definition) {
+      const existing: HttpErrorMappingDefinition[] =
+        (Reflect.getMetadata(
           MAP_HTTP_ERROR,
-          [...existing, errorDefinition],
+
           descriptor.value!,
-        );
-        break;
-      }
+        ) as HttpErrorMappingDefinition[]) ?? [];
 
-      case 'error': {
-        const existing: ErrorMappingDefinition[] =
-          (Reflect.getMetadata(
-            MAP_ERROR,
-            descriptor.value!,
-          ) as ErrorMappingDefinition[]) ?? [];
+      Reflect.defineMetadata(
+        MAP_HTTP_ERROR,
 
-        Reflect.defineMetadata(
+        [...existing, definition],
+
+        descriptor.value!,
+      );
+    } else if ('targetError' in definition) {
+      const existing: HttpErrorMappingDefinition[] =
+        (Reflect.getMetadata(
           MAP_ERROR,
-          [...existing, errorDefinition],
+
           descriptor.value!,
-        );
-        break;
-      }
+        ) as HttpErrorMappingDefinition[]) ?? [];
+
+      Reflect.defineMetadata(
+        MAP_ERROR,
+
+        [...existing, definition],
+
+        descriptor.value!,
+      );
     }
   };
 }
