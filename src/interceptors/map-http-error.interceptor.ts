@@ -8,15 +8,13 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { catchError, Observable, throwError } from 'rxjs';
-import { HttpErrorDefinition } from '../types/http-error-definition.type';
-import { MAP_HTTP_ERROR } from '../symbols/map-http-error.symbol';
+import { HttpErrorCacheHelper } from '../core/http-error-cache.helper';
+import { ErrorCacheHelper } from '../core/error-cache.helper';
 
 @Injectable()
 export class MapHttpErrorInterceptor implements NestInterceptor {
-  private readonly cache = new WeakMap<
-    object,
-    Map<Type<Error>, HttpErrorDefinition>
-  >();
+  private readonly httpErrorCacheHandler = new HttpErrorCacheHelper();
+  private readonly errorCacheHandler = new ErrorCacheHelper();
 
   constructor(private readonly reflector: Reflector) {}
 
@@ -27,25 +25,28 @@ export class MapHttpErrorInterceptor implements NestInterceptor {
 
         const handler = context.getHandler();
 
-        let errorMap = this.cache.get(handler);
+        const mappedError = this.errorCacheHandler.get(
+          handler,
+          err.constructor as Type<Error>,
+          this.reflector,
+        );
 
-        if (!errorMap) {
-          const definitions =
-            this.reflector.get<HttpErrorDefinition[]>(
-              MAP_HTTP_ERROR,
-              handler,
-            ) ?? [];
-
-          errorMap = new Map(definitions.map((def) => [def.error, def]));
-
-          this.cache.set(handler, errorMap);
+        if (mappedError) {
+          const targetError = new mappedError.targetError(mappedError.message);
+          return throwError(() => targetError);
         }
 
-        const mapping = errorMap.get(err.constructor as Type<Error>);
+        const mappedHttpError = this.httpErrorCacheHandler.get(
+          handler,
+          err.constructor as Type<Error>,
+          this.reflector,
+        );
 
-        if (mapping) {
-          const message = mapping.message ?? err.message;
-          return throwError(() => new HttpException(message, mapping.status));
+        if (mappedHttpError) {
+          const message = mappedHttpError.message ?? err.message;
+          return throwError(
+            () => new HttpException(message, mappedHttpError.status),
+          );
         }
 
         return throwError(() => err);

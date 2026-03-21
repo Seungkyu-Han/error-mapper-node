@@ -1,27 +1,44 @@
-import { HttpStatus, Type } from '@nestjs/common';
+import { HttpErrorMappingDefinition } from '../types/http-error-definition.type';
+import { ErrorMappingDefinition } from '../types/error-definition.type';
 import { MAP_HTTP_ERROR } from '../symbols/map-http-error.symbol';
-import { HttpErrorDefinition } from '../types/http-error-definition.type';
+import { MAP_ERROR } from '../symbols/map-error.symbol';
 
-export function MapHttpError({
-  error,
-  status,
-  message,
-}: {
-  error: Type<Error>;
-  status: HttpStatus;
-  message?: string;
-}): MethodDecorator {
+type ErrorDefinition = ErrorMappingDefinition | HttpErrorMappingDefinition;
+
+export function MapHttpError(
+  errorDefinition: ErrorDefinition,
+): MethodDecorator {
   return (target, propertyKey, descriptor) => {
-    const existing: HttpErrorDefinition[] =
-      (Reflect.getMetadata(
-        MAP_HTTP_ERROR,
-        descriptor.value!,
-      ) as HttpErrorDefinition[]) ?? [];
+    switch (errorDefinition.type) {
+      case 'http': {
+        const existing: HttpErrorMappingDefinition[] =
+          (Reflect.getMetadata(
+            MAP_HTTP_ERROR,
+            descriptor.value!,
+          ) as HttpErrorMappingDefinition[]) ?? [];
 
-    Reflect.defineMetadata(
-      MAP_HTTP_ERROR,
-      [...existing, { error, status, message }],
-      descriptor.value!,
-    );
+        Reflect.defineMetadata(
+          MAP_HTTP_ERROR,
+          [...existing, errorDefinition],
+          descriptor.value!,
+        );
+        break;
+      }
+
+      case 'error': {
+        const existing: ErrorMappingDefinition[] =
+          (Reflect.getMetadata(
+            MAP_ERROR,
+            descriptor.value!,
+          ) as ErrorMappingDefinition[]) ?? [];
+
+        Reflect.defineMetadata(
+          MAP_ERROR,
+          [...existing, errorDefinition],
+          descriptor.value!,
+        );
+        break;
+      }
+    }
   };
 }
