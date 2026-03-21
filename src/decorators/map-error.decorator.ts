@@ -5,9 +5,7 @@ import { MAP_ERROR } from '../symbols/map-error.symbol';
 
 type ErrorDefinition = ErrorMappingDefinition | HttpErrorMappingDefinition;
 
-export function MapHttpError(
-  errorDefinition: ErrorDefinition,
-): MethodDecorator {
+export function MapError(errorDefinition: ErrorDefinition): MethodDecorator {
   return (target, propertyKey, descriptor) => {
     switch (errorDefinition.type) {
       case 'http': {

@@ -1,8 +1,8 @@
 import { Type } from '@nestjs/common';
 
-export interface HttpErrorMappingDefinition {
+export type HttpErrorMappingDefinition = {
   type: 'http';
   sourceError: Type<Error>;
-  status: number;
+  targetError: Type<Error>;
   message?: string;
-}
+};
